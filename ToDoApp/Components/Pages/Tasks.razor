@@ -1,0 +1,48 @@
+﻿@page "/tasks"
+@using ToDoApp.Data
+@inject ToDoApp.Services.TaskService TaskService
+
+
+<h3>To-Do-Liste</h3>
+
+<button @onclick="AddSampleTask">Neue Aufgabe hinzufügen</button>
+
+<ul>
+    @foreach (var task in tasks)
+    {
+        <li>
+            <b>@task.Title</b> - @task.Status
+            <button @onclick="() => ToggleStatus(task)">Status wechseln</button>
+            <button @onclick="() => DeleteTask(task.Id)">Löschen</button>
+        </li>
+    }
+</ul>
+
+@code {
+    private List<TaskItem> tasks = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        tasks = await TaskService.GetTasksAsync();
+    }
+
+    private async Task AddSampleTask()
+    {
+        var newTask = new TaskItem { Title = "Neue Aufgabe", Status = "pending" };
+        await TaskService.AddTaskAsync(newTask);
+        tasks = await TaskService.GetTasksAsync();
+    }
+
+    private async Task ToggleStatus(TaskItem task)
+    {
+        task.Status = task.Status == "completed" ? "pending" : "completed";
+        await TaskService.UpdateTaskAsync(task);
+        tasks = await TaskService.GetTasksAsync();
+    }
+
+    private async Task DeleteTask(int id)
+    {
+        await TaskService.DeleteTaskAsync(id);
+        tasks = await TaskService.GetTasksAsync();
+    }
+}
