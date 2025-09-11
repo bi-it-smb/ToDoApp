@@ -1,19 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MySqlConnector;
+using System.Data;
 using ToDoApp.Components;
-using ToDoApp.Data;
+using ToDoApp.Repositories;
 using ToDoApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString, new MySqlServerVersion(new Version(10, 6, 12))));
+// Dapper-DB-Verbindung registrieren
+builder.Services.AddScoped<IDbConnection>(sp => new MySqlConnection(connectionString));
+
+// Repository und Service registrieren
+builder.Services.AddScoped<TaskRepository>();
+builder.Services.AddScoped<TaskService>();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
-builder.Services.AddScoped<TaskService>();
 
 var app = builder.Build();
 

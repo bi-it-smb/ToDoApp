@@ -1,47 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ToDoApp.Data;
+﻿using ToDoApp.Data;
+using ToDoApp.Repositories;
 
 namespace ToDoApp.Services
 {
     public class TaskService
     {
-        private readonly AppDbContext _db;
+        private readonly TaskRepository _repository;
 
-        public TaskService(AppDbContext db)
+        public TaskService(TaskRepository repository)
         {
-            _db = db;
+            _repository = repository;
         }
 
-        public async Task<List<TaskItem>> GetTasksAsync()
-        {
-            return await _db.Tasks.ToListAsync();
-        }
-
-        public async Task<TaskItem> GetTaskByIdAsync(int id)
-        {
-            return await _db.Tasks.FindAsync(id);
-        }
-
-        public async Task AddTaskAsync(TaskItem task)
-        {
-            _db.Tasks.Add(task);
-            await _db.SaveChangesAsync();
-        }
-
-        public async Task UpdateTaskAsync(TaskItem task)
-        {
-            _db.Tasks.Update(task);
-            await _db.SaveChangesAsync();
-        }
-
-        public async Task DeleteTaskAsync(int id)
-        {
-            var task = await _db.Tasks.FindAsync(id);
-            if (task != null)
-            {
-                _db.Tasks.Remove(task);
-                await _db.SaveChangesAsync();
-            }
-        }
+        public Task<IEnumerable<TaskItem>> GetTasksAsync() => _repository.GetTasksAsync();
+        public Task<TaskItem?> GetTaskByIdAsync(int id) => _repository.GetTaskByIdAsync(id);
+        public Task AddTaskAsync(TaskItem task) => _repository.AddTaskAsync(task);
+        public Task UpdateTaskAsync(TaskItem task) => _repository.UpdateTaskAsync(task);
+        public Task DeleteTaskAsync(int id) => _repository.DeleteTaskAsync(id);
     }
 }

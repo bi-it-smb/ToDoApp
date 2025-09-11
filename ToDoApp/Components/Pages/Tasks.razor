@@ -1,7 +1,6 @@
 ﻿@page "/tasks"
 @using ToDoApp.Data
-@inject ToDoApp.Services.TaskService TaskService
-
+@inject ToDoApp.Repositories.TaskRepository TaskRepo
 
 <h3>To-Do-Liste</h3>
 
@@ -23,26 +22,26 @@
 
     protected override async Task OnInitializedAsync()
     {
-        tasks = await TaskService.GetTasksAsync();
+        tasks = (await TaskRepo.GetTasksAsync()).ToList();
     }
 
     private async Task AddSampleTask()
     {
-        var newTask = new TaskItem { Title = "Neue Aufgabe", Status = "pending" };
-        await TaskService.AddTaskAsync(newTask);
-        tasks = await TaskService.GetTasksAsync();
+        var newTask = new TaskItem { Title = "Neue Aufgabe", Description = "", Status = "pending" };
+        await TaskRepo.AddTaskAsync(newTask);
+        tasks = (await TaskRepo.GetTasksAsync()).ToList();
     }
 
     private async Task ToggleStatus(TaskItem task)
     {
         task.Status = task.Status == "completed" ? "pending" : "completed";
-        await TaskService.UpdateTaskAsync(task);
-        tasks = await TaskService.GetTasksAsync();
+        await TaskRepo.UpdateTaskAsync(task);
+        tasks = (await TaskRepo.GetTasksAsync()).ToList();
     }
 
     private async Task DeleteTask(int id)
     {
-        await TaskService.DeleteTaskAsync(id);
-        tasks = await TaskService.GetTasksAsync();
+        await TaskRepo.DeleteTaskAsync(id);
+        tasks = (await TaskRepo.GetTasksAsync()).ToList();
     }
 }
